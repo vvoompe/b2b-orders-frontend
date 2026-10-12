@@ -88,15 +88,18 @@ describe('downloadCsv', () => {
   });
 
   it('формує файл із типом text/csv, щоб Excel і браузер розпізнали формат', () => {
-    const createObjectURL = vi.fn(() => 'blob:mock-url');
+    const holder: { blob: Blob | null } = { blob: null };
+    const createObjectURL = vi.fn((blob: Blob) => {
+      holder.blob = blob;
+      return 'blob:mock-url';
+    });
     Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
     Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
 
     downloadCsv('файл.csv', 'Номер\nЗМ-1');
 
-    const blob = createObjectURL.mock.calls[0][0] as Blob;
-    expect(blob.type).toBe('text/csv;charset=utf-8');
+    expect(holder.blob?.type).toBe('text/csv;charset=utf-8');
   });
 });
 
