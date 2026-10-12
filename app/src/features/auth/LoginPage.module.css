@@ -1,0 +1,123 @@
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-bg);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 460px;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.title {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.input {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.inputInvalid {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.fieldError {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.formError {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.demo {
+  padding: var(--space-3);
+  background: var(--color-surface-alt);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.demoTitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.demoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demoItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+}
+
+.demoCode {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.submit {
+  width: 100%;
+}

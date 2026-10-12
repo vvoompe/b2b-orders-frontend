@@ -1,0 +1,133 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.headerInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandTitle {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+
+.brandSubtitle {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.navList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+}
+
+.navLink:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.navLinkActive {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.navLinkActive:hover {
+  color: var(--color-on-primary);
+  background: var(--color-primary-hover);
+}
+
+.userBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.userName {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--text-sm);
+}
+
+.userRole {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-7);
+}
+
+.mainInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer {
+  padding: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 767px) {
+  .headerInner {
+    padding: var(--space-3);
+  }
+
+  .main {
+    padding: var(--space-4) var(--space-3) var(--space-6);
+  }
+
+  .navLink {
+    padding: 0 var(--space-2);
+  }
+}

@@ -1,0 +1,193 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.title {
+  margin: var(--space-1) 0 0;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--text-md);
+}
+
+.requisites {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.term {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.value {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.forecastValue {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.bigValue {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.forecastMeta {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.riskText {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.factorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.factor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.factorTop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.factorLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.factorValue {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.factorBar {
+  height: 8px;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.factorFillUp {
+  height: 100%;
+  background: var(--color-success);
+}
+
+.factorFillDown {
+  height: 100%;
+  background: var(--color-danger);
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.historyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--color-primary);
+}
+
+.historyTime {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.historyDelta {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.historyNote {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .requisites {
+    grid-template-columns: 1fr;
+  }
+}

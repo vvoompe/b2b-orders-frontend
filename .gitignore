@@ -1,0 +1,12 @@
+# Залежності та артефакти збірки
+app/node_modules/
+app/dist/
+app/coverage/
+
+# Службові файли Hermes
+.hermes/
+
+# Тимчасові файли Windows і редакторів
+Thumbs.db
+desktop.ini
+*.log

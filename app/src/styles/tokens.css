@@ -1,0 +1,73 @@
+/*
+ * Дизайн-токени застосунку. Усі кольори тексту підібрані з контрастом >= 4.5:1
+ * до свого фону (перевірено розрахунком контрасту за WCAG 2.1 AA).
+ */
+:root {
+  color-scheme: light;
+
+  --color-bg: #eef1f6;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7f9fc;
+  --color-border: #c9d2df;
+  --color-border-strong: #8e9cb0;
+  --color-text: #111827;
+  --color-text-muted: #4b5563;
+
+  --color-primary: #12459b;
+  --color-primary-hover: #0d3576;
+  --color-primary-active: #092457;
+  --color-on-primary: #ffffff;
+  --color-primary-soft: #e6edfa;
+
+  --color-success: #0b6236;
+  --color-success-soft: #e2f3ea;
+  --color-danger: #a3180f;
+  --color-danger-soft: #fceae8;
+  --color-warning: #7a4a00;
+  --color-warning-soft: #fdf1dd;
+  --color-offline: #6b3b00;
+  --color-offline-soft: #fff3e0;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --font-sans: 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 25px;
+  --text-2xl: 32px;
+
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.08);
+  --shadow-md: 0 6px 18px rgba(17, 24, 39, 0.14);
+
+  --focus-ring: 3px solid #12459b;
+  --focus-offset: 2px;
+
+  --transition-fast: 120ms ease-out;
+  --transition-base: 200ms ease-out;
+
+  --skeleton-base: #dbe1ea;
+  --skeleton-highlight: #eff3f9;
+
+  --layout-max: 1280px;
+
+  /* Кольори графіків (Recharts приймає лише конкретні значення у SVG-атрибутах) */
+  --chart-primary: #12459b;
+  --chart-secondary: #0b6236;
+  --chart-tertiary: #7a4a00;
+  --chart-grid: #dbe1ea;
+}

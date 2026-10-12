@@ -1,0 +1,139 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Висота рядків фіксована - саме тому після завантаження верстка не «стрибає» */
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1fr 1fr 1fr;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 44px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 172px;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.cell {
+  display: block;
+  height: 14px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 0%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.block {
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Базова заглушка-картка для скелетонів довільних екранів */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 240px;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-6) var(--space-5);
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.stateTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.stateText {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--color-text-muted);
+}
+
+.stateHint {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--color-text);
+}
+
+.errorState {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-offline);
+  background: var(--color-offline-soft);
+  border: 1px solid var(--color-offline);
+  border-radius: var(--radius-md);
+}
+
+.bannerText {
+  margin: 0;
+  font-weight: 600;
+}
