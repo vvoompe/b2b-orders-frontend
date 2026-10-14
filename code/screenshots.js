@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
-const BASE = 'http://localhost:5173';
+const BASE = 'http://127.0.0.1:5173';
 const OUT = 'C:/Users/alexm/Desktop/Study/Frontend/STEM_project/img/screens';
 const DEMO_EMAIL = 'admin@demo.ua';
 const DEMO_PASSWORD = 'admin123';
@@ -125,7 +125,8 @@ async function login(page) {
 
   // 7. Аналітика
   await guard('Скріншот: аналітика', async () => {
-    await page.goto(`${BASE}/analytics`, { waitUntil: 'networkidle' });
+    await page.getByRole('link', { name: 'Аналітика', exact: true }).click();
+    await page.getByRole('heading', { name: 'Аналітика', exact: true }).waitFor();
     await page.waitForTimeout(1500);
     await page.screenshot({ path: `${OUT}/ris10_analytics.png`, fullPage: true });
     return 'ris10_analytics.png';
@@ -133,7 +134,8 @@ async function login(page) {
 
   // 8. Користувачі
   await guard('Скріншот: користувачі', async () => {
-    await page.goto(`${BASE}/admin/users`, { waitUntil: 'networkidle' });
+    await page.getByRole('link', { name: 'Користувачі', exact: true }).click();
+    await page.getByRole('heading', { name: 'Користувачі', exact: true }).waitFor();
     await page.waitForTimeout(1500);
     await page.screenshot({ path: `${OUT}/ris11_users.png`, fullPage: true });
     return 'ris11_users.png';
@@ -159,12 +161,26 @@ async function login(page) {
   });
 
   await context.close();
+  for (const width of [360, 768, 1280]) {
+    const responsive = await browser.newContext({ viewport: { width, height: 900 } });
+    const probe = await responsive.newPage();
+    await login(probe);
+    for (const name of ['Замовлення', 'Аналітика', 'Користувачі']) {
+      await probe.getByRole('link', { name, exact: true }).click();
+      await probe.getByRole('heading', { name, exact: true }).waitFor();
+      await probe.waitForTimeout(1200);
+      const sizes = await probe.evaluate(() => ({ content: document.documentElement.scrollWidth, viewport: innerWidth }));
+      note(`Ширина ${width}: ${name}`, sizes.content <= sizes.viewport, JSON.stringify(sizes));
+    }
+    await responsive.close();
+  }
   await browser.close();
 
   console.log('--- КРОКИ ---');
   for (const step of steps) console.log(step);
   console.log(`--- ПОМИЛКИ КОНСОЛІ: ${String(consoleErrors.length)} ---`);
   for (const error of consoleErrors.slice(0, 10)) console.log(error);
+  if (steps.some(step => step.startsWith('ЗБІЙ')) || consoleErrors.length) process.exitCode = 1;
   console.log('--- ФАЙЛИ ---');
   for (const file of fs.readdirSync(OUT).sort()) {
     const size = fs.statSync(`${OUT}/${file}`).size;

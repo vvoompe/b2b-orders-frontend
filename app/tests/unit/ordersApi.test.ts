@@ -79,10 +79,8 @@ describe('fetchAllOrders', () => {
     let calls = 0;
     server.use(ordersHandler({ total: 100_000, pageSize: 2, onRequest: () => (calls += 1) }));
 
-    const orders = await fetchAllOrders(DEFAULT_ORDER_FILTERS);
-
-    expect(calls).toBe(50);
-    expect(orders).toHaveLength(100);
+    await expect(fetchAllOrders(DEFAULT_ORDER_FILTERS)).rejects.toThrow('Звузьте фільтри');
+    expect(calls).toBe(1);
   });
 
   it('передає помилку сторінки далі, а не віддає часткову вибірку', async () => {

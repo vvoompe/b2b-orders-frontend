@@ -22,6 +22,9 @@ export async function fetchAllOrders(
   const MAX_PAGES = 50;
 
   const first = await fetchOrders({ ...filters, page: 1 }, signal);
+  if (first.pageCount > MAX_PAGES) {
+    throw new Error('Вибірка перевищує 50 сторінок. Звузьте фільтри для експорту.');
+  }
   const collected: Order[] = [...first.items];
   const lastPage = Math.min(first.pageCount, MAX_PAGES);
 

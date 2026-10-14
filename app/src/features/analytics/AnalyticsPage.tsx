@@ -14,7 +14,7 @@ import styles from './AnalyticsPage.module.css';
 function formatKpi(kpi: ModelKpi): string {
   if (kpi.format === 'percent') return formatPercent(kpi.value, 1);
   if (kpi.key === 'roc_auc' || kpi.key === 'f1' || kpi.key === 'brier') {
-    return kpi.value.toFixed(3);
+    return kpi.value.toFixed(3).replace('.', ',');
   }
   return formatNumber(kpi.value);
 }
@@ -69,6 +69,11 @@ export function AnalyticsPage() {
       </div>
 
       {analyticsQuery.isError ? <OfflineBanner onRetry={handleRetry} /> : null}
+
+      <p role="note" className={styles.meta}>
+        Демонстраційні дані: метрики, історія та параметри навчання надходять із mock-API.
+        Реальна ML-модель у цьому проєкті не навчалася.
+      </p>
 
       {isEmpty ? (
         <EmptyState

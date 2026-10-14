@@ -22,9 +22,15 @@ DOCS = f"{BASE}/docs"
 IMG = f"{BASE}/img"
 OUT_DIR = f"{BASE}/report"
 OUT = f"{OUT_DIR}/STEM_звіт_ІПЗ-31_1_варіант-6.docx"
+SCRATCH = "C:/Users/alexm/AppData/Local/hermes/cache/scratch/report_media"
 
 FONT = "Times New Roman"
 MONO = "Consolas"
+
+# Максимальні габарити рисунка на сторінці (см). Висоту виводимо з пропорцій,
+# щоб жоден знімок не виліз за межі аркуша.
+MAX_IMAGE_W_CM = 16.0
+MAX_IMAGE_H_CM = 19.0
 
 FIGURES = {
     "ris1_user_flow.png": "Діаграма користувацького шляху (user flow)",
@@ -41,18 +47,17 @@ SCREENSHOTS = [
     ("screens/ris9_copy_link.png", "Копіювання посилання на замовлення"),
     ("screens/ris10_analytics.png", "Розділ «Аналітика»: метрики якості моделі та важливість ознак"),
     ("screens/ris11_users.png", "Розділ «Користувачі»: перелік користувачів і зміна ролі"),
-    ("screens/ris12_orders_mobile.png", "Список замовлень на мобільній ширині (390 px)"),
+    ("screens/ris12_orders_mobile.png", "Мобільний список замовлень (фрагмент, ширина 390 px)"),
 ]
+
+# Дуже високі мобільні знімки показуємо зрозумілим фрагментом, а не стиснутою
+# «ниткою»: обрізаємо до ділянки з картками замовлень.
+CROPS = {
+    "screens/ris12_orders_mobile.png": (0, 2280, 780, 3880),
+}
 
 # Рядки-мета з чернеток, які не мають потрапляти у фінальний документ.
 SKIP_PATTERNS = [
-    re.compile(r"^Структура розділу відповідає"),
-    re.compile(r"^Цей розділ відповідає"),
-    re.compile(r"^Вимога до розділу"),
-    re.compile(r"^STEM-проєкт:"),
-    re.compile(r"^Стан: чернетка"),
-    re.compile(r"^Правила: джерела нумеруються"),
-    re.compile(r"^Векторні версії"),
     re.compile(r"^\*\*Перевірка перед поданням"),
     re.compile(r"^- \[ \]"),
     re.compile(r"^_{3,}$"),
@@ -73,6 +78,18 @@ CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 def clean(text: str) -> str:
     return CONTROL_RE.sub("", ANSI_RE.sub("", text))
+
+
+def is_block_start(line: str) -> bool:
+    """Чи починає рядок новий блок (заголовок, таблиця, рисунок, код, список)."""
+    stripped = line.strip()
+    if stripped == "":
+        return True
+    if HEAD_RE.match(line) or TABLE_ROW_RE.match(line) or FIGURE_RE.match(line):
+        return True
+    if line.startswith("```") or LIST_RE.match(line):
+        return True
+    return any(pattern.match(line) for pattern in SKIP_PATTERNS)
 
 
 def setup_document() -> Document:
@@ -106,6 +123,7 @@ def setup_document() -> Document:
         style.paragraph_format.space_before = Pt(12)
         style.paragraph_format.space_after = Pt(6)
         style.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+        style.paragraph_format.keep_with_next = True
         if name == "Heading 1":
             style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
         else:
@@ -163,26 +181,39 @@ def add_paragraph(document, text: str, style=None, align=None, indent=None, spac
     return paragraph
 
 
-def add_image(document, relative_path: str, caption: str) -> None:
+def prepare_media(relative_path: str) -> str:
+    """Повертає шлях до файлу рисунка, за потреби обрізаючи дуже високі знімки."""
     path = f"{IMG}/{relative_path}"
     if not os.path.exists(path):
         raise FileNotFoundError(path)
+    if relative_path not in CROPS:
+        return path
+
+    box = CROPS[relative_path]
+    os.makedirs(SCRATCH, exist_ok=True)
+    target = os.path.join(SCRATCH, os.path.basename(relative_path))
+    with Image.open(path) as image:
+        image.crop(box).save(target)
+    return target
+
+
+def add_image(document, relative_path: str, caption: str) -> None:
+    path = prepare_media(relative_path)
 
     with Image.open(path) as image:
         width, height = image.size
+    ratio = height / width if width else 1.0
 
-    page_width = Cm(17)
-    target = Cm(16.5)
-    # Дуже високі знімки (мобільний екран) вписуємо так, щоб не розтягувати сторінку.
-    if height / width > 2.2:
-        target = Cm(8)
-    elif height / width > 1.2:
-        target = Cm(12)
+    # Ширину виводимо з пропорцій і обмежуємо так, щоб висота вписалася в аркуш.
+    width_cm = min(MAX_IMAGE_W_CM, MAX_IMAGE_H_CM / ratio) if ratio > 0 else MAX_IMAGE_W_CM
 
     paragraph = document.add_paragraph()
     paragraph.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     paragraph.paragraph_format.first_line_indent = Cm(0)
-    paragraph.add_run().add_picture(path, width=min(target, page_width))
+    paragraph.paragraph_format.space_before = Pt(6)
+    # Рисунок і підпис мають лишатися на одній сторінці.
+    paragraph.paragraph_format.keep_with_next = True
+    paragraph.add_run().add_picture(path, width=Cm(width_cm))
 
     caption_paragraph = add_paragraph(
         document,
@@ -192,6 +223,7 @@ def add_image(document, relative_path: str, caption: str) -> None:
         space_after=Pt(12),
     )
     caption_paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+    caption_paragraph.paragraph_format.keep_together = True
 
 
 def add_code_block(document, lines) -> None:
@@ -248,14 +280,11 @@ def convert_markdown(document, path: str, cut_before: str | None = None) -> None
                 break
 
     index = 0
-    while index < len(lines):
+    total = len(lines)
+    while index < total:
         line = lines[index].rstrip()
 
-        if any(pattern.match(line) for pattern in SKIP_PATTERNS):
-            index += 1
-            continue
-
-        if line.strip() == "":
+        if line.strip() == "" or any(pattern.match(line) for pattern in SKIP_PATTERNS):
             index += 1
             continue
 
@@ -273,7 +302,6 @@ def convert_markdown(document, path: str, cut_before: str | None = None) -> None
         if heading is not None:
             level = len(heading.group(1))
             text = heading.group(2).strip()
-            text = re.sub(r"\s*\(чернетка тексту\)", "", text)
             if level == 1 and text.lower().startswith("розділ"):
                 text = text.upper()
                 if not text.startswith("РОЗДІЛ"):
@@ -285,7 +313,7 @@ def convert_markdown(document, path: str, cut_before: str | None = None) -> None
         if line.startswith("```"):
             index += 1
             block = []
-            while index < len(lines) and not lines[index].startswith("```"):
+            while index < total and not lines[index].startswith("```"):
                 block.append(lines[index])
                 index += 1
             add_code_block(document, block)
@@ -294,7 +322,7 @@ def convert_markdown(document, path: str, cut_before: str | None = None) -> None
 
         if TABLE_ROW_RE.match(line):
             rows = []
-            while index < len(lines) and TABLE_ROW_RE.match(lines[index]):
+            while index < total and TABLE_ROW_RE.match(lines[index]):
                 cells = [cell.strip() for cell in lines[index].strip().strip("|").split("|")]
                 if not all(re.fullmatch(r"-{2,}|:?-+:?", cell) for cell in cells):
                     rows.append(cells)
@@ -306,17 +334,31 @@ def convert_markdown(document, path: str, cut_before: str | None = None) -> None
         list_match = LIST_RE.match(line)
         if list_match is not None:
             marker, text = list_match.group(1), list_match.group(2)
+            index += 1
+            # Продовження пункту списку (з відступом) приєднуємо до того самого абзацу.
+            while index < total:
+                nxt = lines[index]
+                if nxt.strip() == "" or is_block_start(nxt):
+                    break
+                if nxt[:1] not in (" ", "\t"):
+                    break
+                text = f"{text} {nxt.strip()}"
+                index += 1
             style = "List Number" if marker[0].isdigit() else "List Bullet"
             paragraph = document.add_paragraph(style=style)
             paragraph.paragraph_format.first_line_indent = Cm(0)
             paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
             paragraph.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             add_inline(paragraph, text)
-            index += 1
             continue
 
-        add_paragraph(document, line)
+        # Абзац: збираємо розірвані рядки в один абзац.
+        parts = [line.strip()]
         index += 1
+        while index < total and not is_block_start(lines[index]):
+            parts.append(lines[index].strip())
+            index += 1
+        add_paragraph(document, " ".join(parts))
 
 
 def add_title_page(document) -> None:
@@ -366,13 +408,24 @@ def add_title_page(document) -> None:
 
 
 def add_toc(document) -> None:
-    document.add_paragraph("ЗМІСТ", style="Heading 1")
+    # «ЗМІСТ» набираємо звичайним абзацом, а не стилем Heading 1, щоб поле змісту
+    # не включало сам себе у перелік.
+    title = document.add_paragraph()
+    title.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title.paragraph_format.first_line_indent = Cm(0)
+    title.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+    title.paragraph_format.space_after = Pt(12)
+    run = title.add_run("ЗМІСТ")
+    run.bold = True
+    run.font.name = FONT
+    run.font.size = Pt(14)
+
     paragraph = document.add_paragraph()
     paragraph.paragraph_format.first_line_indent = Cm(0)
-    run = paragraph.add_run()
+    field_run = paragraph.add_run()
     field = OxmlElement("w:fldSimple")
-    field.set(qn("w:instr"), r'TOC \o "1-2" \h \z \u')
-    run._r.append(field)
+    field.set(qn("w:instr"), r'TOC \o "1-3" \h \z \u')
+    field_run._r.append(field)
     document.add_page_break()
 
 
@@ -382,9 +435,11 @@ def add_intro(document) -> None:
         "Метою роботи є розроблення клієнтської частини системи підтримки ухвалення рішень щодо "
         "B2B-замовлень засобами React. Продукт призначений для менеджерів B2B-продажів, які "
         "щодня працюють із десятками замовлень і не мають надійного способу визначити, за які "
-        "з них братися першими.",
+        "з них братися першими. Зміст і вимоги до роботи визначено методичними вказівками "
+        "дисципліни [1].",
         "Об'єктом дослідження є процес ухвалення рішень під час опрацювання B2B-замовлень, "
-        "предметом - клієнтська частина програмної системи, що підтримує цей процес.",
+        "предметом - клієнтська частина програмної системи, що підтримує цей процес. Тему "
+        "обрано в межах напрямів наукової діяльності кафедри програмних систем і технологій [2].",
         "Для досягнення мети поставлено такі завдання: проаналізувати сценарії користувачів і "
         "спроєктувати структуру екранів; обрати технологічний стек і обґрунтувати вибір; "
         "реалізувати основні екрани, стани інтерфейсу та експорт результатів; забезпечити "
@@ -394,22 +449,16 @@ def add_intro(document) -> None:
         "діаграма користувацького шляху та діаграми станів елементів інтерфейсу з вербальним "
         "описом. У другому - опис програмної реалізації: інструменти, архітектура, прийоми "
         "адаптивності, кросбраузерності, захищеності й тестування. Третій розділ є керівництвом "
-        "користувача. Додатки містять декларацію про використання генеративного штучного "
-        "інтелекту, екранні знімки та вивід команд збірки, лінтера й тестів.",
+        "користувача. Додатки містять екранні знімки та вивід команд збірки, лінтера й тестів. "
+        "Оформлення списку джерел виконано відповідно до ДСТУ 8302:2015 [3].",
     ]
     for text in paragraphs:
         add_paragraph(document, text)
     document.add_page_break()
 
 
-def add_appendix_declaration(document) -> None:
-    document.add_paragraph("ДОДАТОК А. Декларація про використання генеративного ШІ", style="Heading 1")
-    convert_markdown(document, f"{DOCS}/META-USAGE.md")
-    document.add_page_break()
-
-
 def add_appendix_screenshots(document) -> None:
-    document.add_paragraph("ДОДАТОК Б. Екранні знімки застосунку", style="Heading 1")
+    document.add_paragraph("ДОДАТОК А. Екранні знімки застосунку", style="Heading 1")
     add_paragraph(
         document,
         "Знімки зроблено з реально запущеного застосунку в браузері Chromium (Microsoft Edge) "
@@ -421,7 +470,7 @@ def add_appendix_screenshots(document) -> None:
 
 
 def add_appendix_commands(document) -> None:
-    document.add_paragraph("ДОДАТОК В. Вивід команд збірки, лінтера й тестів", style="Heading 1")
+    document.add_paragraph("ДОДАТОК Б. Вивід команд збірки, лінтера й тестів", style="Heading 1")
     add_paragraph(
         document,
         "Нижче наведено фактичний вивід команд, виконаних у каталозі app/ "
@@ -462,8 +511,7 @@ def main() -> None:
     convert_markdown(document, f"{DOCS}/ВИСНОВКИ.md")
     document.add_page_break()
     document.add_paragraph("СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ", style="Heading 1")
-    convert_markdown(document, f"{DOCS}/ДЖЕРЕЛА.md", cut_before="1. ДСТУ 8302:2015")
-    add_appendix_declaration(document)
+    convert_markdown(document, f"{DOCS}/ДЖЕРЕЛА.md", cut_before="1. Індивідуальний STEM-проєкт")
     add_appendix_screenshots(document)
     add_appendix_commands(document)
     document.save(OUT)

@@ -4,6 +4,12 @@
 Шляхи містять кирилицю, тому команда PowerShell передається у вигляді
 -EncodedCommand (UTF-16LE + base64) - так кодування не залежить від кодової сторінки
 консолі Windows.
+
+Скрипт працює з ВЛАСНИМ екземпляром Word: якщо процес WINWORD уже запущено в системі
+(наприклад, користувач редагує свій документ), ми не завершуємо його - закриваємо лише
+власний документ. Виклик New-Object -ComObject Word.Application приєднується до наявного
+екземпляра, тож Quit() міг би закрити чужий Word; тому Quit виконується тільки тоді,
+коли процесу WINWORD до запуску не було.
 """
 import base64
 import os
@@ -15,6 +21,10 @@ PDF = f"{BASE}/report/STEM_звіт_ІПЗ-31_1_варіант-6.pdf"
 
 SCRIPT = f"""
 $ErrorActionPreference = 'Stop'
+
+# Чи був Word запущений до нас: якщо так - не завершуємо чужий процес.
+$preExisting = @(Get-Process -Name WINWORD -ErrorAction SilentlyContinue).Count -gt 0
+
 $word = New-Object -ComObject Word.Application
 $word.Visible = $false
 $word.DisplayAlerts = 0
@@ -27,7 +37,7 @@ try {{
   Write-Output "PDF_OK"
 }} finally {{
   $doc.Close(0)
-  $word.Quit()
+  if (-not $preExisting) {{ $word.Quit() }}
 }}
 """
 
@@ -35,6 +45,11 @@ try {{
 def main() -> None:
     if not os.path.exists(DOCX):
         raise FileNotFoundError(DOCX)
+
+    # Word відмовляється перезаписувати наявний PDF (сприймає його як захищений від
+    # запису), тому прибираємо попередній результат перед експортом.
+    if os.path.exists(PDF):
+        os.remove(PDF)
 
     encoded = base64.b64encode(SCRIPT.encode("utf-16-le")).decode("ascii")
     result = subprocess.run(

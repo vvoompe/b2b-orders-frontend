@@ -11,6 +11,9 @@ import type { Order } from '@/api/types';
 import { makeOrder } from '../fixtures';
 
 describe('escapeCsvValue', () => {
+  it.each(['=1+1', '+SUM(A1)', '-1+2', '@SUM(A1)', '  =1'])('захищає текстовий префікс формули %s', (value) => {
+    expect(escapeCsvValue(value)).toBe(`'${value}`);
+  });
   it('залишає простий текст без змін', () => {
     expect(escapeCsvValue('ТОВ Ромашка')).toBe('ТОВ Ромашка');
   });

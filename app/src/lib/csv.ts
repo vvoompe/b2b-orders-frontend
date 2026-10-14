@@ -10,6 +10,8 @@ import { formatDate, formatPercent } from './format';
 
 /** Екранує значення за RFC 4180: лапки, коми та переноси рядків. */
 export function escapeCsvValue(value: string): string {
+  // Текст із формулоподібним префіксом Excel має трактувати як текст.
+  if (/^[\s]*[=+@-]/.test(value)) value = `'${value}`;
   if (/[",\n\r]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
   }

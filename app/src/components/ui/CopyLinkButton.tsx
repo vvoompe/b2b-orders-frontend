@@ -20,9 +20,12 @@ export function CopyLinkButton({ label = 'Копіювати посилання'
         area.value = url;
         area.setAttribute('readonly', '');
         document.body.append(area);
-        area.select();
-        document.execCommand('copy');
-        area.remove();
+        try {
+          area.select();
+          if (!document.execCommand('copy')) throw new Error('Копіювання відхилено');
+        } finally {
+          area.remove();
+        }
       }
       setMessage('Посилання скопійовано в буфер обміну.');
     } catch {

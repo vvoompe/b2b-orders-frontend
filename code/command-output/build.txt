@@ -11,9 +11,9 @@ dist/index.html                           0.77 kB │ gzip:   0.49 kB
 dist/assets/UsersPage-Db5z_Axy.css        1.17 kB │ gzip:   0.45 kB
 dist/assets/AnalyticsPage-Dp7l_gOL.css    1.50 kB │ gzip:   0.52 kB
 dist/assets/index-Di7wImFT.css           22.05 kB │ gzip:   4.52 kB
-dist/assets/UsersPage-DmST1YXB.js         4.25 kB │ gzip:   1.77 kB
-dist/assets/index-MzN1rgLj.js           357.84 kB │ gzip: 111.12 kB
-dist/assets/AnalyticsPage-DXFQsha3.js   392.61 kB │ gzip: 112.20 kB
-dist/assets/browser-BS3VbJyL.js         427.67 kB │ gzip: 160.35 kB
+dist/assets/UsersPage-CwbIjoAv.js         4.25 kB │ gzip:   1.77 kB
+dist/assets/index-BszwNZCP.js           358.10 kB │ gzip: 111.21 kB
+dist/assets/AnalyticsPage-C7WBVdLC.js   392.91 kB │ gzip: 112.34 kB
+dist/assets/browser-XnUwneBV.js         427.67 kB │ gzip: 160.35 kB
 
-[32m✓ built in 523ms[39m
+[32m✓ built in 510ms[39m
